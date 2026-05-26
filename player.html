@@ -58,16 +58,20 @@ document.getElementById("b1").href=du;
 document.getElementById("b2").href=du;
 var v=document.getElementById("v");
 function err(m){var e=document.getElementById("err");e.textContent="❌ "+m;e.style.display="block";}
-if(!su){err("No URL.");}
-else if(Hls.isSupported()){
-  var hls=new Hls();
-  hls.loadSource(su);
-  hls.attachMedia(v);
-  hls.on(Hls.Events.MANIFEST_PARSED,function(){v.play().catch(function(){});});
-  hls.on(Hls.Events.ERROR,function(e,d){if(d.fatal)err("Stream failed. Download karein.");});
-}else if(v.canPlayType("application/vnd.apple.mpegurl")){
-  v.src=su;v.play().catch(function(){});
-}else{err("Not supported.");}
+if(!su&&!du){err("No URL.");}
+else{
+  var playUrl=du||su;
+  v.src=playUrl;
+  v.play().catch(function(){
+    if(su&&Hls.isSupported()){
+      var hls=new Hls();
+      hls.loadSource(su);
+      hls.attachMedia(v);
+      hls.on(Hls.Events.MANIFEST_PARSED,function(){v.play().catch(function(){});});
+      hls.on(Hls.Events.ERROR,function(e,d){if(d.fatal)err("Stream failed. Please download.");});
+    }
+  });
+}
 function goFull(){
   if(tg&&tg.requestFullscreen){tg.requestFullscreen();return;}
   if(v.webkitEnterFullscreen){v.webkitEnterFullscreen();return;}
